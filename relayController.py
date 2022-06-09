@@ -1,12 +1,31 @@
+
 import serial
+import sys
 import time
-arduino = serial.Serial(port='COM7', baudrate=9600, timeout=.1)
-def write_read(x):
-    arduino.write(bytes(x, 'utf-8'))
-    time.sleep(0.05)
-    data = arduino.readline()
-    return data
-#while True:
-    #num = input("Enter a number: ") # Taking input from user
-value = write_read(0xF0)
-print(value) # printing the value
+
+serialInst = serial.Serial()
+
+relayComport = sys.argv[1]
+relayNumber = sys.argv[2]
+relayState = sys.argv[3]
+
+relayControl = [8, 8, 8, 8]
+
+
+print("relayComport = "+relayComport)
+print("relayNumber = "+relayNumber)
+print("relayState = "+relayState)
+
+serialInst.baudrate = 9600
+serialInst.port = relayComport
+serialInst.open()
+
+if(relayState == '1'):
+    relayControl[int(relayNumber)-1] = '1'
+else:
+    relayControl[int(relayNumber)-1] = '0'
+
+for relay in relayControl:
+    serialInst.write(str(relay).encode())
+    time.sleep(.2)
+serialInst.close()
